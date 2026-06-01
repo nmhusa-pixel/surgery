@@ -1,9 +1,11 @@
-const CACHE_NAME = "anticoag-hold-helper-v1";
+const CACHE_NAME = "anticoag-hold-helper-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./anticoagulant_hold_app.html",
   "./manifest.webmanifest",
+  "./app-icon-192.png",
+  "./app-icon-512.png",
   "./surgical-anticoag-icon.png"
 ];
 
