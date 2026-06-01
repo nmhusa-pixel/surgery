@@ -1,4 +1,4 @@
-const CACHE_NAME = "anticoag-hold-helper-v2";
+const CACHE_NAME = "anticoag-hold-helper-v3";
 const APP_SHELL = [
   "./",
   "./index.html",

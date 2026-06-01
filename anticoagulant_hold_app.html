@@ -93,6 +93,13 @@
       justify-items: end;
     }
 
+    .install-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
     .install-button {
       border: 1px solid rgba(255,255,255,0.35);
       background: #eaf2f8;
@@ -107,6 +114,21 @@
     .install-button[hidden] { display: none; }
 
     .install-button:hover { background: #fff; }
+
+    .install-guide {
+      display: none;
+      background: #eef8f6;
+      border: 1px solid #b8d9d4;
+      border-radius: 8px;
+      color: #173430;
+      line-height: 1.45;
+      margin-bottom: 18px;
+      padding: 14px 16px;
+    }
+
+    .install-guide.show { display: block; }
+
+    .install-guide strong { display: block; margin-bottom: 6px; }
 
     main {
       max-width: 1180px;
@@ -325,6 +347,7 @@
       .header-inner, .app-grid, .result-grid { grid-template-columns: 1fr; }
       .source-pill { max-width: none; }
       .header-actions { justify-items: start; }
+      .install-buttons { justify-content: flex-start; }
     }
 
     @media (max-width: 560px) {
@@ -347,12 +370,17 @@
       </div>
       <div class="header-actions">
         <div class="source-pill">Built from MD Anderson, NSW Clinical Excellence Commission, and StatPearls perioperative anticoagulation guidance.</div>
-        <button id="installApp" class="install-button" type="button" hidden>Install app</button>
+        <div class="install-buttons">
+          <button id="installHelp" class="install-button" type="button">Install help</button>
+          <button id="installApp" class="install-button" type="button" hidden>Install app</button>
+        </div>
       </div>
     </div>
   </header>
 
   <main>
+    <div id="installGuide" class="install-guide" role="status" aria-live="polite"></div>
+
     <div class="notice">
       For clinician decision support only. Verify renal function, indication, thromboembolic risk, planned regional anesthesia, and proceduralist preference before changing anticoagulation. This app is not intended for pregnant patients or urgent/emergent procedures.
     </div>
@@ -1054,11 +1082,45 @@
 
     let installPrompt = null;
     const installButton = document.querySelector("#installApp");
+    const installHelpButton = document.querySelector("#installHelp");
+    const installGuide = document.querySelector("#installGuide");
+
+    function installInstructions() {
+      const ua = navigator.userAgent.toLowerCase();
+      const isIOS = /iphone|ipad|ipod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      const isAndroid = /android/.test(ua);
+      const isFirefox = /firefox|fxios/.test(ua);
+      const isStandalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+
+      if (isStandalone) {
+        return "This app is already running in installed-app mode on this device.";
+      }
+      if (isIOS) {
+        return "On iPhone or iPad, install from Safari: tap Share, then Add to Home Screen. Chrome and Firefox on iOS cannot show this page's native install button.";
+      }
+      if (isAndroid && isFirefox) {
+        return "On Firefox for Android, use the browser menu and choose Add to Home screen if available. Firefox may create a home-screen shortcut instead of a full app-drawer install. For the most reliable install experience, open this page in Chrome or Edge and use Install app.";
+      }
+      if (isAndroid) {
+        return "On Android Chrome or Edge, open the browser menu and choose Install app. If this page shows an Install app button, that button can also trigger the native prompt.";
+      }
+      return "On desktop Chrome or Edge, use the browser install icon or this page's Install app button when it appears. Safari and Firefox may require bookmarking or adding a shortcut instead.";
+    }
+
+    function showInstallGuide() {
+      installGuide.innerHTML = `<strong>How to install</strong>${installInstructions()}`;
+      installGuide.classList.add("show");
+      installGuide.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    installHelpButton.addEventListener("click", showInstallGuide);
 
     window.addEventListener("beforeinstallprompt", event => {
       event.preventDefault();
       installPrompt = event;
       installButton.hidden = false;
+      installGuide.innerHTML = "<strong>Install available</strong>This browser supports a native install prompt. Tap Install app in the header.";
+      installGuide.classList.add("show");
     });
 
     installButton.addEventListener("click", async () => {
