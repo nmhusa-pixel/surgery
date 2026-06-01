@@ -1,0 +1,1079 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102638">
+  <title>Peri-Procedure Anticoagulant Hold Helper</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="surgical-anticoag-icon.png">
+  <link rel="apple-touch-icon" href="surgical-anticoag-icon.png">
+  <style>
+    :root {
+      --ink: #18212f;
+      --muted: #5b6575;
+      --line: #d9e0ea;
+      --panel: #ffffff;
+      --paper: #f6f8fb;
+      --teal: #1e766f;
+      --teal-dark: #13534e;
+      --gold: #9a6a12;
+      --rose: #a63a4b;
+      --blue: #2f5f9d;
+      --green: #1f7a4c;
+      --shadow: 0 16px 38px rgba(26, 38, 58, 0.12);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    header {
+      background: #102638;
+      color: #fff;
+      padding: 22px clamp(18px, 3vw, 36px);
+      border-bottom: 5px solid var(--teal);
+    }
+
+    .header-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: clamp(1.45rem, 2.8vw, 2.25rem);
+      line-height: 1.1;
+      margin: 0 0 8px;
+      letter-spacing: 0;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .app-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.25);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+      flex: 0 0 auto;
+    }
+
+    .subhead {
+      margin: 0;
+      color: #dbe6ef;
+      max-width: 780px;
+      line-height: 1.45;
+    }
+
+    .source-pill {
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #eaf2f8;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      max-width: 300px;
+    }
+
+    .header-actions {
+      display: grid;
+      gap: 10px;
+      justify-items: end;
+    }
+
+    .install-button {
+      border: 1px solid rgba(255,255,255,0.35);
+      background: #eaf2f8;
+      color: #102638;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-weight: 800;
+      cursor: pointer;
+      width: max-content;
+    }
+
+    .install-button[hidden] { display: none; }
+
+    .install-button:hover { background: #fff; }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px clamp(14px, 3vw, 36px) 42px;
+    }
+
+    .notice {
+      background: #fff7e5;
+      border: 1px solid #e6c883;
+      color: #45320b;
+      border-radius: 8px;
+      padding: 14px 16px;
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: minmax(300px, 430px) 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0;
+    }
+
+    .panel-body { padding: 18px; }
+
+    label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.88rem;
+      margin-bottom: 7px;
+    }
+
+    select, input[type="search"], input[type="number"] {
+      width: 100%;
+      border: 1px solid #bac6d4;
+      border-radius: 7px;
+      padding: 11px 12px;
+      font-size: 0.98rem;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    select:focus, input:focus {
+      outline: 3px solid rgba(30, 118, 111, 0.18);
+      border-color: var(--teal);
+    }
+
+    .field { margin-bottom: 16px; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+      margin-bottom: 10px;
+    }
+
+    .toggle-row input {
+      inline-size: 18px;
+      block-size: 18px;
+      accent-color: var(--teal);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.35;
+      margin-top: 7px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 116px;
+      background: #fbfcfe;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: clamp(1.2rem, 2.3vw, 1.7rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .risk-low strong { color: var(--green); }
+    .risk-minimal strong { color: var(--green); }
+    .risk-moderate strong { color: var(--gold); }
+    .risk-high strong { color: var(--rose); }
+
+    .summary {
+      border-left: 5px solid var(--teal);
+      background: #eef8f6;
+      padding: 15px 16px;
+      border-radius: 8px;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .callout {
+      border: 1px solid #c6d5ed;
+      background: #f1f6ff;
+      border-radius: 8px;
+      padding: 14px 16px;
+      line-height: 1.45;
+      margin-top: 12px;
+    }
+
+    .list {
+      margin: 0;
+      padding-left: 20px;
+      line-height: 1.55;
+    }
+
+    .procedure-list {
+      display: grid;
+      gap: 8px;
+      max-height: 280px;
+      overflow: auto;
+      padding-right: 5px;
+    }
+
+    .procedure-item {
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 11px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      display: grid;
+      gap: 4px;
+    }
+
+    .procedure-item:hover, .procedure-item.selected {
+      border-color: var(--teal);
+      box-shadow: inset 0 0 0 1px var(--teal);
+    }
+
+    .procedure-title { font-weight: 750; }
+    .procedure-meta { color: var(--muted); font-size: 0.82rem; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: #fff;
+      width: max-content;
+    }
+
+    .badge.low { background: var(--green); }
+    .badge.moderate { background: var(--gold); }
+    .badge.high { background: var(--rose); }
+
+    footer {
+      max-width: 1180px;
+      margin: 0 auto 34px;
+      padding: 0 clamp(14px, 3vw, 36px);
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+
+    a { color: var(--blue); }
+
+    @media (max-width: 920px) {
+      .header-inner, .app-grid, .result-grid { grid-template-columns: 1fr; }
+      .source-pill { max-width: none; }
+      .header-actions { justify-items: start; }
+    }
+
+    @media (max-width: 560px) {
+      .row { grid-template-columns: 1fr; }
+      header { padding-top: 18px; }
+      .metric { min-height: auto; }
+      .app-icon { width: 48px; height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <div class="brand-title">
+          <img class="app-icon" src="surgical-anticoag-icon.png" alt="" aria-hidden="true">
+          <h1>Peri-Procedure Anticoagulant Hold Helper</h1>
+        </div>
+        <p class="subhead">Select a procedure and anticoagulant to estimate preoperative hold timing, restart timing, and when specialist input is recommended.</p>
+      </div>
+      <div class="header-actions">
+        <div class="source-pill">Built from MD Anderson, NSW Clinical Excellence Commission, and StatPearls perioperative anticoagulation guidance.</div>
+        <button id="installApp" class="install-button" type="button" hidden>Install app</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="notice">
+      For clinician decision support only. Verify renal function, indication, thromboembolic risk, planned regional anesthesia, and proceduralist preference before changing anticoagulation. This app is not intended for pregnant patients or urgent/emergent procedures.
+    </div>
+
+    <div class="app-grid">
+      <section aria-labelledby="controls-title">
+        <div class="panel-header">
+          <h2 id="controls-title">Inputs</h2>
+        </div>
+        <div class="panel-body">
+          <div class="field">
+            <label for="guideline">Guideline source</label>
+            <select id="guideline">
+              <option value="mdanderson">MD Anderson algorithm</option>
+              <option value="nsw">NSW Clinical Excellence Commission guideline</option>
+              <option value="chest">CHEST 2022 guideline</option>
+            </select>
+            <div class="hint">Procedure list and timing logic update to the selected reference.</div>
+          </div>
+
+          <div class="field">
+            <label for="procedureSearch">Procedure search</label>
+            <input id="procedureSearch" type="search" placeholder="Type colonoscopy, lumbar puncture, cataract...">
+            <div class="hint">Choose the closest matching procedure. If no match fits, select bleeding risk manually below.</div>
+          </div>
+
+          <div class="field">
+            <label for="procedureSort">Sort procedures</label>
+            <select id="procedureSort">
+              <option value="alpha">Alphabetical</option>
+              <option value="risk">Bleeding risk: high to low</option>
+              <option value="category">Specialty / category</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="procedureList">Matching procedures</label>
+            <div id="procedureList" class="procedure-list" role="listbox" aria-label="Matching procedures"></div>
+          </div>
+
+          <div class="field">
+            <label for="manualRisk">Bleeding risk override</label>
+            <select id="manualRisk">
+              <option value="">Use selected procedure</option>
+              <option value="minimal">Minimal bleeding risk</option>
+              <option value="low">Low bleeding risk</option>
+              <option value="moderate">Moderate or low/moderate bleeding risk</option>
+              <option value="high">High bleeding risk</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="anticoagulant">Antithrombotic medication</label>
+            <select id="anticoagulant">
+              <option value="apixaban">Eliquis (apixaban)</option>
+              <option value="rivaroxaban">Xarelto (rivaroxaban)</option>
+              <option value="edoxaban">Savaysa / Lixiana (edoxaban)</option>
+              <option value="dabigatran">Pradaxa (dabigatran)</option>
+              <option value="warfarin">Coumadin / Jantoven (warfarin)</option>
+              <option value="enoxaparin">Lovenox / Clexane (enoxaparin, therapeutic-dose LMWH)</option>
+              <option value="ufh">Heparin infusion (unfractionated heparin)</option>
+              <option value="fondaparinux">Arixtra (fondaparinux)</option>
+              <option value="aspirin">Bayer Aspirin / Ecotrin (aspirin, acetylsalicylic acid)</option>
+              <option value="clopidogrel">Plavix (clopidogrel)</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="crcl">CrCl / eGFR</label>
+              <input id="crcl" type="number" min="0" max="180" value="70">
+              <div class="hint">mL/min. Dabigatran and DOAC bridging cautions depend heavily on renal function.</div>
+            </div>
+            <div class="field">
+              <label for="thromboRisk">Thromboembolic risk</label>
+              <select id="thromboRisk">
+                <option value="low">Low</option>
+                <option value="high">High</option>
+              </select>
+              <div class="hint">High risk includes recent VTE/stroke or high-risk mechanical/valvular indications.</div>
+            </div>
+          </div>
+
+          <label class="toggle-row">
+            <input id="regional" type="checkbox">
+            Regional anesthesia, epidural catheter, or deep peripheral nerve catheter likely
+          </label>
+          <label class="toggle-row">
+            <input id="extraBleeding" type="checkbox">
+            Additional bleeding risk factors present
+          </label>
+        </div>
+      </section>
+
+      <section aria-labelledby="recommendation-title">
+        <div class="panel-header">
+          <h2 id="recommendation-title">Recommendation</h2>
+        </div>
+        <div class="panel-body">
+          <div class="result-grid">
+            <div id="riskMetric" class="metric">
+              <span>Procedure risk</span>
+              <strong id="riskText">Select a procedure</strong>
+            </div>
+            <div class="metric">
+              <span>Hold before procedure</span>
+              <strong id="holdText">--</strong>
+            </div>
+            <div class="metric">
+              <span>Restart after procedure</span>
+              <strong id="restartText">--</strong>
+            </div>
+          </div>
+
+          <div id="summary" class="summary">Start by selecting a procedure or manually choosing a bleeding risk.</div>
+
+          <div class="callout">
+            <strong>Operational checklist</strong>
+            <ul id="checklist" class="list"></ul>
+          </div>
+
+          <div class="callout">
+            <strong>Selected procedure</strong>
+            <p id="procedureDetail" class="hint">No procedure selected yet.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    Sources: <a href="https://www.mdanderson.org/content/dam/mdanderson/documents/for-physicians/algorithms/clinical-management/clin-management-peri-procedure-anticoagulants-web-algorithm.pdf">MD Anderson Peri-Procedure Management of Anticoagulants algorithm</a>, <a href="https://www.cec.health.nsw.gov.au/__data/assets/pdf_file/0006/458988/Guidelines-on-perioperative-management-of-anticoagulant-and-antiplatelet-agents.pdf">NSW Clinical Excellence Commission periprocedural anticoagulant and antiplatelet guideline</a>, <a href="https://journal.chestnet.org/article/S0012-3692(22)01359-9/fulltext">CHEST 2022 perioperative antithrombotic therapy guideline</a>, and <a href="https://www.ncbi.nlm.nih.gov/books/NBK557590/">StatPearls: Perioperative Anticoagulation Management</a>. Local protocols may differ.
+  </footer>
+
+  <script>
+    const mdAndersonProcedures = [
+      ["Lumbar puncture with or without intrathecal chemotherapy", "high", "General / Neuro-oncology"],
+      ["Bone marrow aspiration and biopsy", "low", "General"],
+      ["Venous port placement", "moderate", "General / Surgical oncology"],
+      ["Venous port removal", "low", "General / Surgical oncology"],
+      ["Coronary intervention", "high", "Cardiology"],
+      ["Diagnostic coronary angiography via femoral access", "moderate", "Cardiology"],
+      ["Coronary artery angiography, radial approach", "low", "Cardiology"],
+      ["Pacemaker or defibrillator placement", "moderate", "Cardiology"],
+      ["Permanent pacemaker battery change", "low", "Cardiology"],
+      ["Complex dental procedure or multiple tooth extraction", "high", "Dental"],
+      ["Endodontic root canal procedure", "moderate", "Dental"],
+      ["Up to 2 tooth extractions", "moderate", "Dental"],
+      ["Dental hygiene or minor dental procedure", "low", "Dental"],
+      ["Breast surgical procedure", "high", "Breast"],
+      ["Vacuum assisted breast biopsy", "moderate", "Breast radiology"],
+      ["Core biopsy of breast or axillary level 1 nodal basin", "low", "Breast radiology"],
+      ["Barrett's esophagus ablation", "high", "Gastroenterology"],
+      ["Endoscopic mucosal resection, submucosal dissection, or polypectomy", "high", "Gastroenterology"],
+      ["Endoscopic ultrasound with fine needle aspiration", "high", "Gastroenterology"],
+      ["PEG placement", "high", "Gastroenterology"],
+      ["Colonoscopy with biopsy", "moderate", "Gastroenterology"],
+      ["ERCP with stent or biopsy", "moderate", "Gastroenterology"],
+      ["Gastroscopy with biopsy", "moderate", "Gastroenterology"],
+      ["Colonoscopy without biopsy", "low", "Gastroenterology"],
+      ["Diagnostic EGD without biopsy", "low", "Gastroenterology"],
+      ["All other Gynecology Oncology procedures", "high", "Gynecology oncology"],
+      ["LEEP or cold knife conization", "moderate", "Gynecology oncology"],
+      ["Endometrial biopsy", "low", "Gynecology oncology"],
+      ["Hysteroscopy", "low", "Gynecology oncology"],
+      ["Dermatologic procedure or Mohs procedure", "low", "Dermatology"],
+      ["Solid organ biopsy", "high", "Neuroradiology"],
+      ["Superficial or palpable mass biopsy", "low", "Neuroradiology"],
+      ["All other Head and Neck Surgery procedures", "high", "Head and neck"],
+      ["Flexible nasopharyngeal laryngoscopy outside OR", "low", "Head and neck"],
+      ["Arthroplasty", "high", "Orthopedic"],
+      ["All other OR oncologic orthopedic procedures", "high", "Orthopedic"],
+      ["Arthroscopy", "moderate", "Orthopedic"],
+      ["Shoulder, foot, and ankle tendon repair", "moderate", "Orthopedic"],
+      ["Joint or soft tissue injection", "low", "Orthopedic"],
+      ["Eye plaque brachytherapy", "high", "Ophthalmic"],
+      ["Posterior eye surgery", "high", "Ophthalmic"],
+      ["Cataract surgery", "low", "Ophthalmic"],
+      ["Intravitreal injection", "low", "Ophthalmic"],
+      ["All OR plastic surgery procedures", "high", "Plastic surgery"],
+      ["Deep non-organ biopsy", "moderate", "Plastic surgery / Radiology"],
+      ["Diagnostic bronchoscopy with transbronchial biopsy", "high", "Pulmonary"],
+      ["Pleuroscopy or pleural biopsy", "high", "Pulmonary"],
+      ["Robotic bronchoscopy", "high", "Pulmonary"],
+      ["Bronchoscopy with endobronchial ultrasound guided needle aspiration", "moderate", "Pulmonary"],
+      ["Thoracentesis", "moderate", "Pulmonary"],
+      ["Tunneled pleural catheter placement or removal", "moderate", "Pulmonary"],
+      ["Diagnostic bronchoscopy without biopsy", "low", "Pulmonary"],
+      ["Diagnostic laparoscopy", "moderate", "Surgical oncology"],
+      ["All other OR Surgical Oncology procedures", "high", "Surgical oncology"],
+      ["Incision and drainage", "moderate", "Surgical oncology"],
+      ["Superficial wide local excision", "moderate", "Surgical oncology"],
+      ["Non-tunneled central venous catheter placement or removal", "low", "Surgical oncology / Vascular access"],
+      ["All OR Thoracic and Cardiovascular Surgery procedures", "high", "Thoracic/cardiovascular"],
+      ["Pericardial window", "moderate", "Thoracic/cardiovascular"],
+      ["All open and hybrid vascular surgery procedures", "high", "Vascular surgery"],
+      ["Paracentesis", "low", "Vascular access / General"],
+      ["PICC placement", "low", "Vascular access"],
+      ["Tunneled central venous catheter removal", "low", "Vascular access"]
+    ].map(([name, risk, category], index) => ({ id: `md-${index}`, name, risk, category, source: "mdanderson" }));
+
+    const nswProcedures = [
+      ["Minor dental procedure: extraction, restoration, prosthetics, endodontics, cleaning, filling", "minimal", "Dental"],
+      ["Minor dermatologic procedure: excision of basal or squamous cell cancer, actinic keratosis, skin nevus", "minimal", "Dermatology"],
+      ["Ophthalmological cataract procedure", "minimal", "Ophthalmology"],
+      ["Pacemaker or cardioverter-defibrillator device implantation", "minimal", "Cardiology"],
+      ["Removal of external fixator", "minimal", "Orthopedics"],
+      ["Abdominal hernia repair", "moderate", "General surgery"],
+      ["Abdominal hysterectomy", "moderate", "Gynecology"],
+      ["Arthroscopy", "moderate", "Orthopedics"],
+      ["Cutaneous or lymph node biopsy", "moderate", "Surgery / Radiology"],
+      ["Bronchoscopy with or without biopsy", "moderate", "Pulmonary"],
+      ["Colonoscopy with or without biopsy", "moderate", "Gastroenterology"],
+      ["Coronary angiography", "moderate", "Cardiology"],
+      ["Foot or hand procedure", "moderate", "Orthopedics"],
+      ["Gastrointestinal endoscopy with or without biopsy", "moderate", "Gastroenterology"],
+      ["Haemorrhoidal procedure", "moderate", "Colorectal surgery"],
+      ["Laparoscopic cholecystectomy", "moderate", "General surgery"],
+      ["Small skin graft", "moderate", "Plastic surgery / Dermatology"],
+      ["Any major operation longer than 45 minutes", "high", "General"],
+      ["Bowel resection", "high", "Colorectal surgery"],
+      ["Cancer procedure including lung, oesophagus, gastric, colon, hepatobiliary, or pancreatic resection", "high", "Oncology surgery"],
+      ["Cardiac procedure", "high", "Cardiac surgery"],
+      ["Intracranial procedure", "high", "Neurosurgery"],
+      ["Spinal procedure", "high", "Neurosurgery / Orthopedics"],
+      ["Colonic polyp resection", "high", "Gastroenterology"],
+      ["Epidural injection", "high", "Pain / Anesthesia"],
+      ["Major procedure with extensive tissue injury", "high", "General"],
+      ["Major orthopedic procedure including hip, knee, or shoulder replacement", "high", "Orthopedics"],
+      ["Major thoracic procedure", "high", "Thoracic surgery"],
+      ["Nephrectomy or kidney biopsy", "high", "Urology / Radiology"],
+      ["Neuraxial anesthesia including spinal, epidural, or neuraxial intervention", "high", "Anesthesia"],
+      ["PEG placement or ERCP", "high", "Gastroenterology"],
+      ["Procedure in highly vascular organ: kidney, liver, or spleen", "high", "Surgery / Radiology"],
+      ["Reconstructive plastic procedure", "high", "Plastic surgery"],
+      ["Transurethral prostate resection, bladder resection, or tumor ablation", "high", "Urology"],
+      ["Urologic or gastrointestinal procedure including anastomosis", "high", "Urology / Gastrointestinal surgery"]
+    ].map(([name, risk, category], index) => ({ id: `nsw-${index}`, name, risk, category, source: "nsw" }));
+
+    const chestProcedures = [
+      ["Cataract surgery", "minimal", "Ophthalmology"],
+      ["Minor dental procedure", "minimal", "Dental"],
+      ["Minor dermatologic procedure", "minimal", "Dermatology"],
+      ["Pacemaker or cardioverter-defibrillator device implantation", "minimal", "Cardiology"],
+      ["Abdominal hernia repair", "moderate", "General surgery"],
+      ["Abdominal hysterectomy", "moderate", "Gynecology"],
+      ["Arthroscopy", "moderate", "Orthopedics"],
+      ["Bronchoscopy", "moderate", "Pulmonary"],
+      ["Colonoscopy", "moderate", "Gastroenterology"],
+      ["Coronary angiography", "moderate", "Cardiology"],
+      ["Gastrointestinal endoscopy", "moderate", "Gastroenterology"],
+      ["Hemorrhoidal surgery", "moderate", "Colorectal surgery"],
+      ["Laparoscopic cholecystectomy", "moderate", "General surgery"],
+      ["Lymph node biopsy", "moderate", "Surgery / Radiology"],
+      ["Any operation lasting more than 45 minutes", "high", "General"],
+      ["Cardiac surgery", "high", "Cardiac surgery"],
+      ["Gastrointestinal surgery", "high", "Gastrointestinal surgery"],
+      ["Intracranial or spinal surgery", "high", "Neurosurgery / Spine"],
+      ["Kidney biopsy", "high", "Nephrology / Radiology"],
+      ["Major orthopedic surgery", "high", "Orthopedics"],
+      ["Major thoracic surgery", "high", "Thoracic surgery"],
+      ["Most cancer surgeries", "high", "Oncology surgery"],
+      ["Most urologic surgeries", "high", "Urology"],
+      ["Neuraxial anesthesia or epidural injection", "high", "Anesthesia / Pain"]
+    ].map(([name, risk, category], index) => ({ id: `chest-${index}`, name, risk, category, source: "chest" }));
+
+    const sourceNotes = {
+      minimal: "NSW CEC classifies minimal bleeding risk procedures as about 0% 30-day major bleeding risk and notes they can often be performed under full anticoagulation.",
+      low: "MD Anderson classifies low bleeding risk procedures as generally not requiring anticoagulant interruption unless patient-specific factors change the risk.",
+      moderate: "MD Anderson notes moderate bleeding risk procedures generally target 2-3 anticoagulant half-lives between last dose and procedure.",
+      high: "MD Anderson notes high bleeding risk procedures generally target 4-5 anticoagulant half-lives between last dose and procedure."
+    };
+
+    const nswNotes = {
+      minimal: "NSW CEC lists minimal bleeding risk procedures separately; for DOACs, withholding the dose on the day of procedure may be considered to avoid peak effect.",
+      moderate: "NSW CEC groups low/moderate bleeding risk procedures as allowing some residual anticoagulant effect, generally a 2-3 half-life interruption.",
+      high: "NSW CEC high bleeding risk procedures require no residual anticoagulant effect, generally a 4-5 half-life interruption."
+    };
+
+    const chestNotes = {
+      minimal: "CHEST 2022 classifies minimal bleeding risk procedures as generally appropriate for continuing antithrombotic treatment.",
+      moderate: "CHEST 2022 groups these as low-to-moderate bleeding risk; most DOACs are held 24 hours pre-procedure with normal renal function.",
+      high: "CHEST 2022 high bleeding risk procedures generally use a longer interruption, with most DOACs held 48 hours before surgery."
+    };
+
+    const els = {
+      guideline: document.querySelector("#guideline"),
+      procedureSearch: document.querySelector("#procedureSearch"),
+      procedureSort: document.querySelector("#procedureSort"),
+      procedureList: document.querySelector("#procedureList"),
+      manualRisk: document.querySelector("#manualRisk"),
+      anticoagulant: document.querySelector("#anticoagulant"),
+      crcl: document.querySelector("#crcl"),
+      thromboRisk: document.querySelector("#thromboRisk"),
+      regional: document.querySelector("#regional"),
+      extraBleeding: document.querySelector("#extraBleeding"),
+      riskMetric: document.querySelector("#riskMetric"),
+      riskText: document.querySelector("#riskText"),
+      holdText: document.querySelector("#holdText"),
+      restartText: document.querySelector("#restartText"),
+      summary: document.querySelector("#summary"),
+      checklist: document.querySelector("#checklist"),
+      procedureDetail: document.querySelector("#procedureDetail")
+    };
+
+    let selectedProcedure = null;
+
+    function activeProcedures() {
+      if (els.guideline.value === "nsw") return nswProcedures;
+      if (els.guideline.value === "chest") return chestProcedures;
+      return mdAndersonProcedures;
+    }
+
+    function sortProcedures(list) {
+      const riskOrder = { high: 0, moderate: 1, low: 2, minimal: 3 };
+      const sorted = [...list];
+      if (els.procedureSort.value === "risk") {
+        sorted.sort((a, b) => {
+          const riskDelta = riskOrder[a.risk] - riskOrder[b.risk];
+          return riskDelta || a.name.localeCompare(b.name);
+        });
+      } else if (els.procedureSort.value === "category") {
+        sorted.sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
+      } else {
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+      }
+      return sorted;
+    }
+
+    function effectiveRisk() {
+      const manual = els.manualRisk.value;
+      const base = manual || selectedProcedure?.risk || "";
+      if (els.extraBleeding.checked && base === "minimal") return "high";
+      if (els.extraBleeding.checked && base === "moderate") return "high";
+      if (els.extraBleeding.checked && base === "low") return "high";
+      if ((els.guideline.value === "nsw" || els.guideline.value === "chest") && base === "low") return "moderate";
+      return base;
+    }
+
+    function titleCaseRisk(risk) {
+      if (risk === "moderate" && (els.guideline.value === "nsw" || els.guideline.value === "chest")) return "Low/Moderate";
+      return risk ? risk[0].toUpperCase() + risk.slice(1) : "Select a procedure";
+    }
+
+    function recommendation() {
+      const risk = effectiveRisk();
+      const drug = els.anticoagulant.value;
+      const crcl = Number(els.crcl.value || 0);
+      const regional = els.regional.checked;
+      const highThrombo = els.thromboRisk.value === "high";
+      const source = els.guideline.value;
+
+      if (!risk) return { hold: "--", restart: "--", summary: "Start by selecting a procedure or manually choosing a bleeding risk.", items: [] };
+      if (source === "nsw") return nswRecommendation(risk, drug, crcl, regional, highThrombo);
+      if (source === "chest") return chestRecommendation(risk, drug, crcl, regional, highThrombo);
+      if (drug === "aspirin" || drug === "clopidogrel") return mdAndersonAntiplateletRecommendation(risk, drug, regional, highThrombo);
+      if ((risk === "low" || risk === "minimal") && !regional) {
+        return {
+          hold: "Do not interrupt",
+          restart: "Continue",
+          summary: "For low bleeding risk procedures, the MD Anderson algorithm generally recommends not interrupting anticoagulation.",
+          items: ["Confirm the procedure truly remains low bleeding risk.", "If recent bleeding, thrombocytopenia, or other bleeding risks are present, use high-risk guidance.", "Coordinate final plan with proceduralist and prescribing clinician."]
+        };
+      }
+
+      let hold = "";
+      let restart = risk === "high" ? "48-72 hours" : "24 hours";
+      const items = ["Document last dose date/time.", "Confirm hemostasis before restart.", "Check for interacting antiplatelet therapy and local protocol differences."];
+
+      if (drug === "apixaban" || drug === "rivaroxaban" || drug === "edoxaban") {
+        hold = risk === "high" ? "2 days" : "1 day";
+        if (regional) hold = "3 days";
+        if (drug === "rivaroxaban" && crcl < 30) items.push("CrCl below 30 mL/min: consider hematology/pharmacy input before using routine DOAC timing.");
+        if (highThrombo && risk === "high") items.push("High thromboembolic risk plus high bleeding risk: MD Anderson describes bridging considerations for selected recent VTE/stroke patients.");
+      }
+
+      if (drug === "dabigatran") {
+        if (crcl < 30) {
+          hold = "Consult hematology";
+          items.push("MD Anderson flags dabigatran with CrCl below 30 mL/min for specialist consultation.");
+        } else if (crcl < 50) {
+          hold = risk === "high" ? "5 days" : "2 days";
+          if (regional && risk === "moderate") hold = "4 days";
+          if (regional && risk === "high") hold = "Regional not recommended";
+        } else {
+          hold = risk === "high" ? "3 days" : "1 day";
+          if (regional) hold = risk === "high" ? "Regional not recommended" : "3 days";
+        }
+      }
+
+      if (drug === "warfarin") {
+        hold = risk === "high" || risk === "moderate" || regional ? "5 days" : "Often continue";
+        restart = "12-24 hours";
+        items.push("Check INR approximately 2 days before surgery; StatPearls notes vitamin K may be considered if INR remains >1.5.");
+        items.push(highThrombo ? "High thromboembolic risk: evaluate need for bridging." : "Low thromboembolic risk: bridging is generally not recommended.");
+      }
+
+      if (drug === "enoxaparin") {
+        hold = "24 hours";
+        restart = risk === "high" ? "48-72 hours" : "24 hours";
+        items.push("Timing assumes therapeutic-dose LMWH; prophylaxis-dose regimens may differ.");
+      }
+
+      if (drug === "ufh") {
+        hold = "4-6 hours";
+        restart = risk === "high" ? "48-72 hours" : "24 hours";
+        items.push("For IV unfractionated heparin, StatPearls describes stopping 4-6 hours before surgery.");
+      }
+
+      if (drug === "fondaparinux") {
+        hold = regional ? "36-42 hours minimum" : (risk === "high" ? "3-4 days" : "2 days");
+        restart = risk === "high" ? "48-72 hours" : "24 hours";
+        items.push("Neuraxial/regional timing is especially sensitive for fondaparinux.");
+      }
+
+      if (regional) items.push("Regional anesthesia/catheter plan should be cleared with anesthesia or acute pain service.");
+
+      return {
+        hold,
+        restart,
+        summary: `${sourceNotes[risk]} Estimated hold for ${els.anticoagulant.options[els.anticoagulant.selectedIndex].text}: ${hold} before procedure; restart ${restart} after procedure if hemostasis is adequate.`,
+        items
+      };
+    }
+
+    function mdAndersonAntiplateletRecommendation(risk, drug, regional, highThrombo) {
+      const items = ["Document last dose date/time.", "Confirm hemostasis before restart.", "If recent coronary/carotid/intracranial stent or dual antiplatelet therapy is present, coordinate with cardiology, neurology, and the proceduralist before interruption."];
+      let hold = "";
+      let restart = "24 hours";
+
+      if (drug === "aspirin") {
+        hold = risk === "low" && !regional ? "Do not interrupt" : "Usually continue; consider 7 days if interruption required";
+        restart = hold === "Do not interrupt" ? "Continue" : "24 hours";
+        items.push("Aspirin is often continued perioperatively; interruption is mainly considered for procedures where even small bleeding is dangerous, such as selected intracranial, spinal, or posterior eye procedures.");
+      }
+
+      if (drug === "clopidogrel") {
+        hold = risk === "low" && !regional ? "Often continue" : "5 days";
+        restart = "24 hours";
+        items.push("Clopidogrel interruption is commonly 5 days when the procedural bleeding risk justifies stopping it.");
+        if (highThrombo) items.push("High thrombotic risk or recent stent: do not stop clopidogrel without specialist agreement.");
+      }
+
+      if (regional) items.push("Neuraxial/regional anesthesia plans need anesthesia or acute pain service clearance for antiplatelet therapy.");
+
+      return {
+        hold,
+        restart,
+        summary: `MD Anderson antiplatelet decision support for ${els.anticoagulant.options[els.anticoagulant.selectedIndex].text}: ${hold}; restart ${restart} after procedure if hemostasis is adequate.`,
+        items
+      };
+    }
+
+    function nswRecommendation(risk, drug, crcl, regional, highThrombo) {
+      const items = ["Document last dose date/time.", "Confirm hemostasis before restart.", "Use specialist advice for renal dialysis, high bleeding plus high thrombotic risk, or local policy differences."];
+      let hold = "";
+      let restart = risk === "high" ? "Day +3" : "Day +1";
+
+      if (risk === "minimal" && !regional) {
+        if (["apixaban", "rivaroxaban", "edoxaban", "dabigatran"].includes(drug)) {
+          hold = "Consider omit day-of dose";
+          restart = "Next scheduled dose";
+          items.push("NSW notes minimal-risk procedures can usually be done under full anticoagulation, but same-day DOAC withholding may avoid peak anticoagulant effect.");
+        } else if (drug === "warfarin") {
+          hold = "Continue if INR therapeutic";
+          restart = "Continue";
+          items.push("Confirm INR is within therapeutic range at the time of procedure.");
+        } else if (drug === "aspirin") {
+          hold = "Continue";
+          restart = "Continue";
+          items.push("NSW notes minor dental, dermatologic, ophthalmologic, and device procedures are minimal bleeding risk; single antiplatelet therapy is commonly continued.");
+        } else if (drug === "clopidogrel") {
+          hold = "Usually continue if single antiplatelet";
+          restart = "Continue";
+          items.push("If on dual antiplatelet therapy, avoid stopping the P2Y12 inhibitor without cardiology/proceduralist agreement.");
+        } else {
+          hold = "Usually continue";
+          restart = "Continue";
+          items.push("Confirm with proceduralist because NSW minimal-risk guidance focuses on oral agents.");
+        }
+        return {
+          hold,
+          restart,
+          summary: `${nswNotes.minimal} Estimated ${els.anticoagulant.options[els.anticoagulant.selectedIndex].text} plan: ${hold}; ${restart}.`,
+          items
+        };
+      }
+
+      if (drug === "aspirin") {
+        hold = risk === "high" || regional ? "Usually continue; consider 7 days if interruption required" : "Continue";
+        restart = hold === "Continue" ? "Continue" : "24 hours";
+        items.push("NSW antiplatelet guidance emphasizes balancing bleeding risk against cardiovascular or cerebrovascular thrombotic risk.");
+        items.push("If aspirin is for secondary prevention or coronary stent protection, avoid interruption without specialist agreement.");
+      } else if (drug === "clopidogrel") {
+        hold = "5 days";
+        restart = "24 hours";
+        items.push("NSW/CHEST-derived antiplatelet timing commonly uses a 5-day clopidogrel interruption when stopping is needed.");
+        if (highThrombo) items.push("High thrombotic risk, recent ACS, or recent stent: specialist input is required before stopping clopidogrel.");
+      } else if (drug === "apixaban" || drug === "rivaroxaban") {
+        hold = risk === "high" ? "Day -3 last dose" : "Day -2 last dose";
+        restart = risk === "high" ? "Day +3" : "Day +1";
+        if (regional) {
+          const cutoff = drug === "apixaban" ? 25 : 30;
+          hold = crcl < cutoff ? "Seek hematology advice" : "3 days";
+          restart = "At least 6 hours after catheter removal";
+          items.push("NSW neuraxial guidance states therapeutic-dose DOACs are contraindicated while an epidural catheter is in place.");
+        }
+      } else if (drug === "edoxaban") {
+        hold = risk === "high" ? "Day -3 last dose" : "Day -2 last dose";
+        restart = risk === "high" ? "Day +3" : "Day +1";
+        items.push("The NSW DOAC table lists apixaban, rivaroxaban, and dabigatran; edoxaban is approximated using factor Xa inhibitor timing and should be checked locally.");
+      } else if (drug === "dabigatran") {
+        if (crcl < 30) {
+          hold = "Seek hematology advice";
+          restart = "Specialist plan";
+          items.push("NSW recommends specialist advice for dabigatran with CrCl below 30 mL/min.");
+        } else if (regional) {
+          if (crcl >= 80) hold = "3 days";
+          else if (crcl >= 50) hold = "4 days";
+          else hold = "5 days";
+          restart = "At least 6 hours after catheter removal";
+          items.push("NSW neuraxial DOAC timing uses longer dabigatran holds as renal function declines.");
+        } else if (crcl < 50) {
+          hold = risk === "high" ? "Day -5 last dose" : "Day -3 last dose";
+          restart = risk === "high" ? "Day +3" : "Day +1";
+        } else {
+          hold = risk === "high" ? "Day -3 last dose" : "Day -2 last dose";
+          restart = risk === "high" ? "Day +3" : "Day +1";
+        }
+      } else if (drug === "warfarin") {
+        hold = "5 days";
+        restart = "12-24 hours";
+        items.push("NSW warfarin guidance: cease 5 days before low/moderate or high bleeding risk procedures.");
+        items.push(highThrombo ? "High thromboembolic risk: NSW indicates bridging therapy is required and should be individualized." : "Low/moderate thromboembolic risk: NSW indicates bridging therapy is not required.");
+        if (regional) {
+          hold = "5 days and INR < 1.5";
+          restart = "At least 4 hours after catheter removal";
+        }
+      } else if (drug === "enoxaparin") {
+        hold = "24 hours";
+        restart = risk === "high" ? "48-72 hours" : "24 hours";
+        items.push("NSW neuraxial table lists at least 24 hours after therapeutic LMWH before catheter insertion/removal.");
+      } else if (drug === "ufh") {
+        hold = regional ? "At least 6 hours and normal aPTT" : "4-6 hours";
+        restart = regional ? "At least 1 hour after catheter removal, no bolus" : (risk === "high" ? "48-72 hours" : "24 hours");
+        items.push("NSW neuraxial table specifies at least 6 hours for therapeutic IV UFH and checking aPTT is normal.");
+      } else if (drug === "fondaparinux") {
+        hold = regional ? "Specialist advice" : (risk === "high" ? "3-4 days" : "2 days");
+        restart = risk === "high" ? "48-72 hours" : "24 hours";
+        items.push("Fondaparinux is not detailed in the NSW tables used here; confirm with local protocol.");
+      }
+
+      if (highThrombo && risk === "high") items.push("NSW cautions high bleeding plus high thromboembolic risk should involve specialist/proceduralist decision-making.");
+      if (regional) items.push("Seek specialist anesthetic advice for neuraxial or epidural catheter procedures.");
+
+      return {
+        hold,
+        restart,
+        summary: `${nswNotes[risk]} Estimated hold for ${els.anticoagulant.options[els.anticoagulant.selectedIndex].text}: ${hold}; restart ${restart} if hemostasis is adequate.`,
+        items
+      };
+    }
+
+    function chestRecommendation(risk, drug, crcl, regional, highThrombo) {
+      const items = ["Document last dose date/time.", "Confirm hemostasis before restart.", "Consider longer holds for severe renal impairment, hepatic impairment, or strong CYP3A4/P-gp interacting medicines."];
+      let hold = "";
+      let restart = risk === "high" ? "48-72 hours" : "24 hours";
+
+      if (regional) {
+        items.push("CHEST perioperative tables are not a neuraxial anesthesia protocol; use anesthesia/ASRA or local neuraxial guidance.");
+      }
+
+      if (risk === "minimal" && !regional) {
+        if (drug === "warfarin") {
+          hold = "Continue";
+          restart = "Continue";
+          items.push("CHEST strongly recommends continuing VKA therapy for pacemaker or ICD implantation.");
+        } else if (drug === "aspirin" || drug === "clopidogrel") {
+          hold = "Continue";
+          restart = "Continue";
+          if (drug === "clopidogrel") items.push("For dual antiplatelet therapy, CHEST summaries commonly continue aspirin and interrupt the P2Y12 inhibitor only when needed.");
+        } else {
+          hold = "Continue";
+          restart = "Continue";
+        }
+        return {
+          hold,
+          restart,
+          summary: `${chestNotes.minimal} Estimated ${els.anticoagulant.options[els.anticoagulant.selectedIndex].text} plan: ${hold}; ${restart}.`,
+          items
+        };
+      }
+
+      if (drug === "aspirin") {
+        hold = "Continue";
+        restart = "Continue";
+        items.push("CHEST suggests aspirin continuation for many elective noncardiac surgeries; exceptions include procedures where bleeding consequences are severe.");
+      } else if (drug === "clopidogrel") {
+        hold = risk === "minimal" && !regional ? "Continue" : "5 days";
+        restart = hold === "Continue" ? "Continue" : "24 hours";
+        items.push("CHEST summaries list clopidogrel interruption as 5 days before surgery when stopping is required.");
+        if (highThrombo) items.push("Recent coronary stent or high thrombotic risk: do not stop clopidogrel without cardiology/proceduralist input.");
+      } else if (["apixaban", "rivaroxaban", "edoxaban"].includes(drug)) {
+        hold = risk === "high" ? "48 hours" : "24 hours";
+        restart = risk === "high" ? "48-72 hours" : "24 hours";
+        items.push("CHEST suggests against perioperative heparin bridging for DOAC interruption.");
+      } else if (drug === "dabigatran") {
+        if (crcl < 50) {
+          hold = risk === "high" ? "4 days" : "3 days";
+        } else {
+          hold = risk === "high" ? "48 hours" : "24 hours";
+        }
+        restart = risk === "high" ? "48-72 hours" : "24 hours";
+        items.push("Dabigatran hold is longer when renal function is reduced.");
+        items.push("CHEST suggests against perioperative heparin bridging for DOAC interruption.");
+      } else if (drug === "warfarin") {
+        hold = "5 days";
+        restart = "12-24 hours";
+        items.push("CHEST recommends stopping warfarin at least 5 days before low/moderate or high bleeding risk procedures.");
+        items.push(highThrombo ? "CHEST bridging recommendations vary by indication; individualize for high thrombotic risk." : "CHEST generally recommends no bridging for low/moderate thrombotic risk.");
+      } else if (drug === "enoxaparin") {
+        hold = "24 hours";
+        restart = risk === "high" ? "48-72 hours" : "At least 24 hours";
+        items.push("If bridging with LMWH, CHEST summaries describe half daily dose 24 hours before surgery, then stop.");
+      } else if (drug === "ufh") {
+        hold = "At least 4 hours";
+        restart = risk === "high" ? "48-72 hours" : "At least 24 hours";
+        items.push("CHEST summaries describe stopping IV UFH at least 4 hours before procedure.");
+      } else if (drug === "fondaparinux") {
+        hold = risk === "high" ? "3-4 days" : "2 days";
+        restart = risk === "high" ? "48-72 hours" : "24 hours";
+        items.push("Fondaparinux is not central in the CHEST summary tables used here; verify locally.");
+      }
+
+      return {
+        hold,
+        restart,
+        summary: `${chestNotes[risk]} Estimated hold for ${els.anticoagulant.options[els.anticoagulant.selectedIndex].text}: ${hold}; restart ${restart} after procedure if hemostasis is adequate.`,
+        items
+      };
+    }
+
+    function renderProcedures() {
+      const query = els.procedureSearch.value.trim().toLowerCase();
+      const matches = sortProcedures(activeProcedures()
+        .filter(p => !query || `${p.name} ${p.category} ${p.risk}`.toLowerCase().includes(query))
+      )
+        .slice(0, 30);
+
+      els.procedureList.innerHTML = "";
+      matches.forEach(proc => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `procedure-item${selectedProcedure?.id === proc.id ? " selected" : ""}`;
+        button.innerHTML = `<span class="procedure-title">${proc.name}</span><span class="procedure-meta">${proc.category} | <span class="badge ${proc.risk}">${titleCaseRisk(proc.risk)}</span></span>`;
+        button.addEventListener("click", () => {
+          selectedProcedure = proc;
+          els.manualRisk.value = "";
+          render();
+        });
+        els.procedureList.appendChild(button);
+      });
+    }
+
+    function render() {
+      renderProcedures();
+      const risk = effectiveRisk();
+      const rec = recommendation();
+      els.riskMetric.className = `metric risk-${risk || "none"}`;
+      els.riskText.textContent = titleCaseRisk(risk);
+      els.holdText.textContent = rec.hold;
+      els.restartText.textContent = rec.restart;
+      els.summary.textContent = rec.summary;
+      els.checklist.innerHTML = rec.items.map(item => `<li>${item}</li>`).join("");
+      if (selectedProcedure) {
+        const changed = els.extraBleeding.checked || els.manualRisk.value;
+        const sourceName = selectedProcedure.source === "nsw" ? "NSW CEC" : (selectedProcedure.source === "chest" ? "CHEST 2022" : "MD Anderson");
+        els.procedureDetail.textContent = `${selectedProcedure.name} (${selectedProcedure.category}) is listed as ${titleCaseRisk(selectedProcedure.risk)} bleeding risk in the ${sourceName} app data.${changed ? " Effective risk was adjusted by current inputs." : ""}`;
+      } else {
+        els.procedureDetail.textContent = "No procedure selected yet.";
+      }
+    }
+
+    Object.values(els).forEach(el => {
+      if (el && ["INPUT", "SELECT"].includes(el.tagName)) {
+        el.addEventListener("input", render);
+        el.addEventListener("change", render);
+      }
+    });
+
+    els.guideline.addEventListener("change", () => {
+      selectedProcedure = activeProcedures()[0];
+      els.manualRisk.value = "";
+      render();
+    });
+
+    selectedProcedure = mdAndersonProcedures.find(p => p.name.includes("Colonoscopy with biopsy"));
+    render();
+
+    let installPrompt = null;
+    const installButton = document.querySelector("#installApp");
+
+    window.addEventListener("beforeinstallprompt", event => {
+      event.preventDefault();
+      installPrompt = event;
+      installButton.hidden = false;
+    });
+
+    installButton.addEventListener("click", async () => {
+      if (!installPrompt) return;
+      installPrompt.prompt();
+      await installPrompt.userChoice;
+      installPrompt = null;
+      installButton.hidden = true;
+    });
+
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("service-worker.js");
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "Peri-Procedure Anticoagulant Hold Helper",
+  "short_name": "Anticoag Hold",
+  "description": "Procedure-based perioperative antithrombotic hold and restart decision support.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f8fb",
+  "theme_color": "#102638",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "surgical-anticoag-icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
